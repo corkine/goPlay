@@ -1,14 +1,26 @@
+# 受保护 API
+GET     /list                       controllers.HomeController.list(limit:Int = 1000)
+GET     /info/:id                   controllers.HomeController.info(id:Long)
+GET     /schema/:clazz              controllers.HomeController.schema(clazz:String)
+GET     /add                        controllers.HomeController.addGet(keyword:String, redirectURL:String, note:Option[String])
++nocsrf
+POST    /add                        controllers.HomeController.addJSON()
+GET     /delete/:id                 controllers.HomeController.delete(id:Long)
 
-# Routes
-# This file defines all application routes (Higher priority routes first)
-# ~~~~
+GET     /users/list                 controllers.HomeController.listUser
+GET     /users/add                  controllers.HomeController.addUser(name:String,password:String,role:Option[services.UserType])
+GET     /users/delete/:id           controllers.HomeController.deleteUser(id:Long)
 
-# An example controller showing a sample home page
-GET     /                           controllers.HomeController.index
-GET     /add                        controllers.HomeController.add(name:String, short:String, long:String)
-GET     /schema                     controllers.HomeController.schema
-GET     /:shortUrl                  controllers.HomeController.go(shortUrl:String)
-# Map static resources from the /public folder to the /assets URL path
+# 其他资源
+GET     /manage                     controllers.Assets.at(path="/public", file="manage.html")
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+
+# 公共 API
+## 主页说明
+GET     /                           controllers.HomeController.index
+## 通过数字 id 跳转网页，比如 /id/234
+GET     /id/:id                     controllers.HomeController.id(id:Long)
+## 通过关键词跳转网页，比如 /maven
+GET     /:shortUrl                  controllers.HomeController.go(shortUrl:String)
 
       

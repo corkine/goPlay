@@ -1,0 +1,110 @@
+@main("goPlay 快速链接跳转服务") {
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">goPlay 短连接跳转服务</a>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">主页 <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="http://git.mazhangjing.com">Git 服务</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="http://static2.mazhangjing.com">图床服务</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        关于作者
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="http://www.mazhangjing.com">主页</a>
+                        <a class="dropdown-item" href="http://blog.mazhangjing.com">博客</a>
+                    </div>
+                </li>
+            </ul>
+            <button class="btn btn-dark">
+                <a href="manage" class="no-style">管理</a>
+            </button>
+        </div>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-10 mt-3 ml-3">
+                <div class="jumbotron pb-5 pt-5">
+                    <h1 class="display-4">短链接跳转服务</h1>
+                    <p class="lead">此服务用来将 go.mazhangjing.com/?? 的网址重定向到其他站点，可类似看做短连接服务或者网页收藏服务。</p>
+                    <hr class="my-4">
+                    <p class="text-muted">服务保证：所有 go.mazhangjing.com/?? 指向的链接将在添加到系统内的 5 年内有效，但不保证指向的 URL 有效。</p>
+                    <a class="btn btn-primary btn-lg" href="#" role="button">了解更多</a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-10 mt-0 ml-3">
+                <div class="accordion" id="accordionExample">
+                    <div class="card">
+                        <div class="card-header" id="headingOne">
+                            <h2 class="mb-0">
+                                <button class="btn btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">使用基本说明
+                                </button>
+                            </h2>
+                        </div>
+
+                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+                            <div class="card-body">
+                                关键词跳转：对于关键词 <code>home</code> 的链接, 直接访问 <code>go.mazhangjing.com/home</code> 即可跳转到指定链接。<br/>
+                                序列号跳转：对于序列号 <code>233</code> 的链接，直接访问 <code>go.mazhangjing.com/id/233</code> 即可跳转到指定链接。
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" id="headingTwo">
+                            <h2 class="mb-0">
+                                <button class="btn btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    服务对接说明
+                                </button>
+                            </h2>
+                        </div>
+                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+                            <div class="card-body">
+                                <p class="lead">基本：通过 GET /add 方法</p>
+                                <p>
+                                    通过 <code>GET go.mazhangjing.com/add</code>，传入参数 <code>keyword、redirectURL、note（可选）</code>以添加记录，返回 JSON 格式文件。
+                                </p>
+                                <p>
+                                    比如 <code>GET go.mazhangjing.com/add?keyword=home&redirectURL=www.mazhangjing.com</code> 可创建 go.mazhangjing.com/home 指向 www.mazhangjing.com 的链接。注意，此处 redirectURL 可以加 <code>https://</code> 或者 <code>http://</code>，也可以不加。
+                                </p>
+                                <hr/>
+                                <p class="lead">更多：参见网站路由</p>
+                                <img src="@routes.Assets.versioned("images/route.png")"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" id="headingThree">
+                            <h2 class="mb-0">
+                                <button class="btn btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">开发相关说明
+                                </button>
+                            </h2>
+                        </div>
+
+                        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
+                            <div class="card-body">
+                                本程序使用 Play Scala with sbt 开发，数据存储使用 H2 嵌入式数据库，数据库访问采用 Slick FRM 框架，前端界面采用 Bootstrap 和 Vue with Ant Design(管理部分) 构建。
+                                <p>
+                                    <img src="http://static2.mazhangjing.com/badge/openjdk.png" />
+                                    <img src="http://static2.mazhangjing.com/badge/scala.png" />
+                                    <img src="http://static2.mazhangjing.com/badge/play.png" />
+                                    <img src="http://static2.mazhangjing.com/badge/slick.png" />
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

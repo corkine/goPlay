@@ -1,14 +1,26 @@
 package services
 
-import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, OFormat}
+import java.time.LocalDateTime
 
-case class Entity(name:String, shortUrl:String, longUrl:String, id:Long = 0L)
+import play.api.libs.functional.syntax._
+import play.api.libs.json.{JsPath, Json, Reads, Writes}
+
+case class Entity(keyword:String,
+                  redirectURL:String,
+                  note:Option[String],
+                  updateTime: LocalDateTime = LocalDateTime.now(), id:Long = 0L)
+
 object Entity {
-  def tuple2E(name:String,shortUrl:String,longUrl:String): Entity = Entity(name,shortUrl,longUrl)
-  def e2Tuple(e:Entity): (String, String, String) = (e.name, e.shortUrl, e.longUrl)
-  implicit val entityFormat: OFormat[Entity] =
-    ((JsPath \ "name").format[String] and
-      (JsPath \ "shortUrl").format[String] and
-      (JsPath \ "longUrl").format[String])(tuple2E, e2Tuple)
+  def tuple2E(keyword:String,redirectURL:String,note:Option[String]): Entity = Entity(keyword,redirectURL,note)
+  implicit val entityRead: Reads[Entity] =
+    ((JsPath \ "keyword").read[String] and
+    (JsPath \ "redirectURL").read[String] and
+    (JsPath \ "note").readNullable[String])(tuple2E _)
+  implicit val entityWrite: Writes[Entity] = (o: Entity) => Json.obj(
+    "keyword" -> o.keyword,
+    "redirectURL" -> o.redirectURL,
+    "note" -> o.note,
+    "updateTime" -> o.updateTime,
+    "id" -> o.id
+  )
 }

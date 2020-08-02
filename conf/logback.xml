@@ -27,12 +27,12 @@
 
   <logger name="services" level="DEBUG" />
   <logger name="play" level="INFO" />
-  <logger name="application" level="DEBUG" />
+  <logger name="application" level="INFO" />
   <logger name="slick" level="INFO"/>
   <logger name="slick.ast" level="INFO"/>
   <logger name="slick.compiler" level="INFO"/>
-  <logger name="slick.jdbc.JdbcBackend.statement" level="DEBUG"/>
-  <logger name="slick.jdbc.StatementInvoker.result" level="DEBUG"/>
+  <logger name="slick.jdbc.JdbcBackend.statement" level="INFO"/>
+  <logger name="slick.jdbc.StatementInvoker.result" level="INFO"/>
 
   <!-- Off these ones as they are annoying, and anyway we manage configuration ourselves -->
   <logger name="com.avaje.ebean.config.PropertyMapLoader" level="OFF" />

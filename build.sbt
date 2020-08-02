@@ -13,9 +13,10 @@ scalaVersion := "2.12.2"
 libraryDependencies ++= Seq(ehcache , ws , specs2 % Test , guice,
   "com.typesafe.play" %% "play-slick" % "5.0.0",
   "com.typesafe.play" %% "play-slick-evolutions" % "5.0.0",
-  "com.h2database" % "h2" % "1.4.199",
-  "mysql" % "mysql-connector-java" % "5.1.41"
+  "com.h2database" % "h2" % "1.4.199"
 )
+
+//"mysql" % "mysql-connector-java" % "5.1.41"
 
 unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )
 
