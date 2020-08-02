@@ -114,10 +114,10 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
     }
   }
 
-  def addUser(name:String, password:String, role:Option[UserType]) = Action.async { req =>
+  def addUser(username:String, password:String, role:Option[UserType]) = Action.async { req =>
     authAdmin(req) flatMap {
       case Right(value) => Future(value)
-      case Left(_) => userService.add(name,password,role.getOrElse(Common)).map {
+      case Left(_) => userService.add(username,password,role.getOrElse(Common)).map {
           case true => message("User add done.")
           case false => message("User add failed.")
         }
@@ -156,7 +156,7 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
 
   def authenticatedInQuery(request:Request[AnyContent]): Option[Either[Result,(String,String)]] = {
     (for {
-      user <- request.getQueryString("username")
+      user <- request.getQueryString("user")
       password <- request.getQueryString("password")
     } yield (user, password)) match {
       case None => None

@@ -8,7 +8,7 @@ POST    /add                        controllers.HomeController.addJSON()
 GET     /delete/:id                 controllers.HomeController.delete(id:Long)
 
 GET     /users/list                 controllers.HomeController.listUser
-GET     /users/add                  controllers.HomeController.addUser(name:String,password:String,role:Option[services.UserType])
+GET     /users/add                  controllers.HomeController.addUser(username:String,password:String,role:Option[services.UserType])
 GET     /users/delete/:id           controllers.HomeController.deleteUser(id:Long)
 
 # 其他资源
