@@ -1,6 +1,6 @@
 name := "go"
  
-version := "1.1"
+version := "1.2"
       
 lazy val `go` = (project in file(".")).enablePlugins(PlayScala,LauncherJarPlugin)
 
