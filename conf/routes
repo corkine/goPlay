@@ -1,15 +1,12 @@
-# 受保护 API
+# 受保护 API - BASIC OR TOKEN OR QUERY
 GET     /list                       controllers.HomeController.list(limit:Int = 1000)
 GET     /info/:id                   controllers.HomeController.info(id:Long)
 GET     /schema/:clazz              controllers.HomeController.schema(clazz:String)
 GET     /add                        controllers.HomeController.addGet(keyword:String, redirectURL:String, note:Option[String])
 +nocsrf
-POST    /add                        controllers.HomeController.addJSON()
+POST    /add                        controllers.HomeController.addJSON
 GET     /delete/:id                 controllers.HomeController.delete(id:Long)
-
-GET     /users/list                 controllers.HomeController.listUser
-GET     /users/add                  controllers.HomeController.addUser(username:String,password:String,role:Option[services.UserType])
-GET     /users/delete/:id           controllers.HomeController.deleteUser(id:Long)
+GET     /token                      controllers.HomeController.token
 
 # 其他资源
 GET     /manage                     controllers.Assets.at(path="/public", file="manage.html")
@@ -22,5 +19,6 @@ GET     /                           controllers.HomeController.index
 GET     /id/:id                     controllers.HomeController.id(id:Long)
 ## 通过关键词跳转网页，比如 /maven
 GET     /:shortUrl                  controllers.HomeController.go(shortUrl:String)
+
 
       

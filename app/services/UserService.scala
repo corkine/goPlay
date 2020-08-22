@@ -2,6 +2,7 @@ package services
 
 import javax.inject.{Inject, Singleton}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import play.api.libs.Codecs
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,8 +37,14 @@ class UserService @Inject()(protected val dbConfigProvider:DatabaseConfigProvide
 
   private val users = TableQuery[Users]
 
-  def check(username:String, password:String): Future[Option[User]] = {
-    db.run(users.filter(i => i.username === username && i.password === password).result.headOption)
+  def check(username:String, tokenOrPassword:String, useSHA1:Boolean, exTime:Int): Future[Option[User]] = {
+    db.run(users.filter(i => i.username === username).result.headOption) map {
+      case None => None
+      case Some(u) => if (useSHA1) {
+        if (Codecs.sha1(u.password + ":" + exTime) == tokenOrPassword) Some(u)
+        else None
+      } else Some(u)
+    }
   }
 
   def schema: String = users.schema.createStatements.mkString(" ")
