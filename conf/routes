@@ -1,7 +1,6 @@
 # 受保护 API - BASIC OR TOKEN OR QUERY
 GET     /list                       controllers.HomeController.list(limit:Int = 1000)
 GET     /info/:id                   controllers.HomeController.info(id:Long)
-GET     /schema/:clazz              controllers.HomeController.schema(clazz:String)
 GET     /add                        controllers.HomeController.addGet(keyword:String, redirectURL:String, note:Option[String])
 +nocsrf
 POST    /add                        controllers.HomeController.addJSON
@@ -9,6 +8,7 @@ GET     /delete/:id                 controllers.HomeController.delete(id:Long)
 GET     /token                      controllers.HomeController.token
 
 # 其他资源
+GET     /schema/:clazz              controllers.HomeController.schema(clazz:String)
 GET     /manage                     controllers.Assets.at(path="/public", file="manage.html")
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 

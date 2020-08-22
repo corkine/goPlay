@@ -1,17 +1,15 @@
 package controllers
 
-import java.time.{LocalDateTime, ZoneOffset}
 import java.util.Base64
 
 import javax.inject.{Inject, Singleton}
 import play.api.libs.Codecs
 import play.api.libs.json.{JsError, JsSuccess, Json}
-import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents, Cookie, Request, Result}
+import play.api.mvc._
 import play.mvc.Http.HeaderNames
-import services.{Admin, Common, Entity, EntityService, User, UserService, UserType}
+import services._
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 @Singleton
 class HomeController @Inject()(cc:ControllerComponents, entityService: EntityService, userService:UserService)
@@ -39,15 +37,16 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
     }
   }
 
-  ////////////////////////////////// User Private Controller Method //////////////////////////////////
-
-  def list(limit:Int): Action[AnyContent] = Action.async { req =>
-    authUsers(req) flatMap {
-      case Right(value) => Future(value)
-      case Left(_) =>
-        entityService.list(limit).map { bean => Ok(Json.toJson(bean)) }
+  def schema(clazz:String): Action[AnyContent] = Action {
+    val res = clazz match {
+      case "entity" => entityService.schema
+      case "user" => userService.schema
+      case _ => "NOTHING"
     }
+    Ok(Json.obj("schema" -> res))
   }
+
+  ////////////////////////////////// User Private Controller Method //////////////////////////////////
 
   def info(id:Long): Action[AnyContent] = Action.async { req =>
     authUsers(req) flatMap {
@@ -88,26 +87,6 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
     }
   }
 
-  def delete(id:Long): Action[AnyContent] = Action.async { req =>
-    authAdmin(req) flatMap {
-      case Right(value) => Future(value)
-      case Left(_) =>
-        entityService.delete(id).map {
-          case 1 => message("Delete 1 done.")
-          case _ => message("Delete failed.")
-        }
-    }
-  }
-
-  def schema(clazz:String): Action[AnyContent] = Action {
-    val res = clazz match {
-      case "entity" => entityService.schema
-      case "user" => userService.schema
-      case _ => "NOTHING"
-    }
-    Ok(Json.obj("schema" -> res))
-  }
-
   def token: Action[AnyContent] = Action.async { req =>
     @inline def getTokenWrapped(user: User):String = {
       val expTime = (System.currentTimeMillis() / 1000) + (24 * 60 * 60)
@@ -123,6 +102,24 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
   }
 
   ////////////////////////////////// Admin Private Controller Method //////////////////////////////////
+  def list(limit:Int): Action[AnyContent] = Action.async { req =>
+    authAdmin(req) flatMap {
+      case Right(value) => Future(value)
+      case Left(_) =>
+        entityService.list(limit).map { bean => Ok(Json.toJson(bean)) }
+    }
+  }
+
+  def delete(id:Long): Action[AnyContent] = Action.async { req =>
+    authAdmin(req) flatMap {
+      case Right(value) => Future(value)
+      case Left(_) =>
+        entityService.delete(id).map {
+          case 1 => message("Delete 1 done.")
+          case _ => message("Delete failed.")
+        }
+    }
+  }
 
   def listUser = Action.async { req => authAdmin(req) flatMap {
       case Left(_) => userService.list.map { res => Ok(Json.toJson(res)) }
