@@ -101,6 +101,16 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
     }
   }
 
+  def checkKeyword(keyword:String): Action[AnyContent] = Action.async { req =>
+    authUsers(req) flatMap {
+      case Right(value) => Future(value)
+      case Left(_) => entityService.check(keyword).map {
+        case None => Ok(Json.obj("status" -> 0, "message" -> "haven't find this entity in db.", "entity" -> None))
+        case Some(value) => Ok(Json.obj("status" -> 1, "message" -> "Done.", "entity" -> value))
+      }
+    }
+  }
+
   ////////////////////////////////// Admin Private Controller Method //////////////////////////////////
   def list(limit:Int): Action[AnyContent] = Action.async { req =>
     authAdmin(req) flatMap {
@@ -118,6 +128,16 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
           case 1 => message("Delete 1 done.")
           case _ => message("Delete failed.")
         }
+    }
+  }
+
+  def deleteKeyword(keyword:String): Action[AnyContent] = Action.async { req =>
+    authAdmin(req) flatMap {
+      case Right(value) => Future(value)
+      case Left(_) => entityService.deleteKeyword(keyword).map {
+        case 0 => Ok(Json.obj("message" -> "Delete Failed.", "row" -> 0, "status" -> 0))
+        case i if i != 0 => Ok(Json.obj("message" -> "Delete done.", "row" -> i, "status" -> 1))
+      }
     }
   }
 
@@ -193,7 +213,8 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
       password <- request.getQueryString("password")
     } yield (user, password)) match {
       case None => None
-      case Some((u,p)) => Some(Right((u,p,false,0)))
+      case Some((u,p)) =>
+        Some(Right((u,p,false,0)))
     }
   }
 

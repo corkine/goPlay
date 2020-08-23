@@ -1,24 +1,23 @@
-# 受保护 API - BASIC OR TOKEN OR QUERY
+######## 受保护 API - BASIC OR TOKEN OR QUERY ##########
 GET     /list                       controllers.HomeController.list(limit:Int = 1000)
 GET     /info/:id                   controllers.HomeController.info(id:Long)
+GET     /check/:keyword             controllers.HomeController.checkKeyword(keyword:String)
 GET     /add                        controllers.HomeController.addGet(keyword:String, redirectURL:String, note:Option[String])
 +nocsrf
 POST    /add                        controllers.HomeController.addJSON
+GET     /deleteKey/:keyword            controllers.HomeController.deleteKeyword(keyword:String)
 GET     /delete/:id                 controllers.HomeController.delete(id:Long)
 GET     /token                      controllers.HomeController.token
 
-# 其他资源
-GET     /schema/:clazz              controllers.HomeController.schema(clazz:String)
-GET     /manage                     controllers.Assets.at(path="/public", file="manage.html")
-GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
-
-# 公共 API
-## 主页说明
+#######  公共 API  ########
 GET     /                           controllers.HomeController.index
-## 通过数字 id 跳转网页，比如 /id/234
 GET     /id/:id                     controllers.HomeController.id(id:Long)
-## 通过关键词跳转网页，比如 /maven
+GET     /manage                     controllers.Assets.at(path="/public", file="index.html")
+GET     /schema/:clazz              controllers.HomeController.schema(clazz:String)
+# 匹配单级
 GET     /:shortUrl                  controllers.HomeController.go(shortUrl:String)
+# 匹配多级
+GET     /*file               controllers.Assets.versioned(path="/public", file: Asset)
 
 
       

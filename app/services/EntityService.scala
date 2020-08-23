@@ -50,6 +50,10 @@ class EntityService @Inject()(protected val dbConfigProvider:DatabaseConfigProvi
     entity.filter(_.id === id).delete
   }
 
+  def deleteKeyword(keyword:String): Future[Int] = db.run {
+    entity.filter(_.keyword === keyword).delete
+  }
+
   /*def add(newEntity:Entity): Future[Either[String,(Int,Entity)]] =
     db.run(entity.filter(e => e.name === newEntity.name ||
       e.keyword === newEntity.keyword).exists.result).flatMap {
@@ -59,6 +63,10 @@ class EntityService @Inject()(protected val dbConfigProvider:DatabaseConfigProvi
 
   def find(keyword:String): Future[Seq[Entity]] = db.run {
     entity.filter(_.keyword === keyword).result
+  }
+
+  def check(keyword:String): Future[Option[Entity]] = db.run {
+    entity.filter(_.keyword === keyword).result.headOption
   }
 
   def schema: String = entity.schema.createStatements.mkString("\n").replace("\"","'")

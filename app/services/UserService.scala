@@ -40,10 +40,13 @@ class UserService @Inject()(protected val dbConfigProvider:DatabaseConfigProvide
   def check(username:String, tokenOrPassword:String, useSHA1:Boolean, exTime:Int): Future[Option[User]] = {
     db.run(users.filter(i => i.username === username).result.headOption) map {
       case None => None
-      case Some(u) => if (useSHA1) {
-        if (Codecs.sha1(u.password + ":" + exTime) == tokenOrPassword) Some(u)
-        else None
-      } else Some(u)
+      case Some(u) =>
+        if (useSHA1) {
+          if (Codecs.sha1(u.password + ":" + exTime) == tokenOrPassword) Some(u)
+          else None
+        } else {
+          if (tokenOrPassword == u.password) Some(u) else None
+        }
     }
   }
 
