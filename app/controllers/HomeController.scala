@@ -1,5 +1,6 @@
 package controllers
 
+import java.nio.charset.StandardCharsets
 import java.util.Base64
 
 import javax.inject.{Inject, Singleton}
@@ -20,10 +21,10 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
   def index = Action { Ok(views.html.Introduction()) }
 
   def go(shortUrl:String) = Action.async {
-    @inline def handleURL(str: String): String = {
-      if (str.startsWith("http://") || str.startsWith("https://")) str
-      else "http://" + str
-    }
+    @inline def handleURL(str: String): String = java.net.URLEncoder.encode({
+        if (str.startsWith("http://") || str.startsWith("https://")) str
+        else "http://" + str
+      },StandardCharsets.UTF_8.toString)
     entityService.find(shortUrl).map {
       case i if i.nonEmpty => Redirect(handleURL(i.head.redirectURL))
       case _ => NotFound
