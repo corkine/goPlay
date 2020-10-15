@@ -28,6 +28,7 @@
   <logger name="services" level="DEBUG" />
   <logger name="play" level="INFO" />
   <logger name="application" level="INFO" />
+  <logger name="controllers" level="INFO" />
   <logger name="slick" level="INFO"/>
   <logger name="slick.ast" level="INFO"/>
   <logger name="slick.compiler" level="INFO"/>

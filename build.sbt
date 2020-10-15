@@ -1,6 +1,6 @@
 name := "go"
  
-version := "2.1.0"
+version := "2.1.3"
 
 description :=
   """
@@ -8,6 +8,7 @@ description :=
     |[Version 1.3.1] 2020-08-22 修复了访问页面权限的问题，现在访问所有记录，以及删除记录都需要 Admin 权限。
     |[Version 2.0.0] 2020-08-24 整合了 Vue 开发的管理页面，添加了几个便捷的 API。
     |[Version 2.1.0] 2020-08-24 提供了管理页面 Token 的自动加载和验证功能。
+    |[Version 2.1.3] 2020-10-15 恢复了之前的 URL 编码方式，放弃对中文编码（交给 JS）。添加 CM(cm) 开头短连接直接跳转到 CMGOOD 系统。
     |""".stripMargin
       
 lazy val `go` = (project in file(".")).enablePlugins(PlayScala,LauncherJarPlugin)

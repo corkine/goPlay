@@ -4,6 +4,8 @@ import java.nio.charset.StandardCharsets
 import java.util.Base64
 
 import javax.inject.{Inject, Singleton}
+import org.slf4j.LoggerFactory
+import play.api.{Configuration, Logger}
 import play.api.libs.Codecs
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc._
@@ -13,25 +15,32 @@ import services._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class HomeController @Inject()(cc:ControllerComponents, entityService: EntityService, userService:UserService)
+class HomeController @Inject()(cc:ControllerComponents, entityService: EntityService, userService:UserService, config:Configuration)
                               (implicit ec:ExecutionContext)
   extends AbstractController(cc) {
+
+  val logI: String => Unit = LoggerFactory.getLogger(getClass).info(_)
+  val goodURL: String = config.get[String]("goods.url")
+
   ////////////////////////////////// Public API //////////////////////////////////
 
-  def index = Action { Ok(views.html.Introduction()) }
+  def index: Action[AnyContent] = Action { Ok(views.html.Introduction()) }
 
-  def go(shortUrl:String) = Action.async {
-    @inline def handleURL(str: String): String = java.net.URLEncoder.encode({
-        if (str.startsWith("http://") || str.startsWith("https://")) str
-        else "http://" + str
-      },StandardCharsets.UTF_8.toString)
+  def go(shortUrl:String): Action[AnyContent] = Action.async {
+    @inline def handleURL(str: String): String =
+      if (str.startsWith("http://") || str.startsWith("https://")) str
+      else "http://" + str
     entityService.find(shortUrl).map {
       case i if i.nonEmpty => Redirect(handleURL(i.head.redirectURL))
       case _ => NotFound
     }
   }
 
-  def id(id:Long) = Action.async {
+  def goGood(shortUrl:String): Action[AnyContent] = Action { r =>
+    Redirect(s"$goodURL/$shortUrl/details", r.queryString)
+  }
+
+  def id(id:Long): Action[AnyContent] = Action.async {
     entityService.id(id).map {
       case Some(value) => Redirect(routes.HomeController.go(value.keyword))
       case None => NotFound
@@ -64,7 +73,9 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
     authUsers(req) flatMap {
       case Right(value) => Future(value)
       case Left(_) =>
-        entityService.add(Entity(keyword,redirectURL,note)).collect {
+        if (keyword.toUpperCase.startsWith("CM")) {
+          Future(Ok(Json.obj("status" -> 0, "entity" -> None,"message" -> "Error! Don't use CM/cm/Cm/cM start keywords in system.")))
+        } else entityService.add(Entity(keyword,redirectURL,note)).collect {
           case (conflict,_) if conflict =>
             Ok(Json.obj("status" -> 0, "entity" -> None,"message" -> "Create failed, existed"))
           case (_,entity) =>
@@ -105,9 +116,11 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
   def checkKeyword(keyword:String): Action[AnyContent] = Action.async { req =>
     authUsers(req) flatMap {
       case Right(value) => Future(value)
-      case Left(_) => entityService.check(keyword).map {
-        case None => Ok(Json.obj("status" -> 0, "message" -> "haven't find this entity in db.", "entity" -> None))
-        case Some(value) => Ok(Json.obj("status" -> 1, "message" -> "Done.", "entity" -> value))
+      case Left(_) => if (keyword.toUpperCase().startsWith("CM")) {
+        Future(Ok(Json.obj("status" -> 1, "message" -> "Exist! Don't use CM/cm/Cm/cM start keywords in system.", "entity" -> None)))
+      } else entityService.check(keyword).map {
+          case None => Ok(Json.obj("status" -> 0, "message" -> "haven't find this entity in db.", "entity" -> None))
+          case Some(value) => Ok(Json.obj("status" -> 1, "message" -> "Done.", "entity" -> value))
       }
     }
   }

@@ -1,11 +1,12 @@
 ######## 受保护 API - BASIC OR TOKEN OR QUERY ##########
+GET     /data                       controllers.Default.redirect(to="/list")
 GET     /list                       controllers.HomeController.list(limit:Int = 1000)
 GET     /info/:id                   controllers.HomeController.info(id:Long)
 GET     /check/:keyword             controllers.HomeController.checkKeyword(keyword:String)
 GET     /add                        controllers.HomeController.addGet(keyword:String, redirectURL:String, note:Option[String])
 +nocsrf
 POST    /add                        controllers.HomeController.addJSON
-GET     /deleteKey/:keyword            controllers.HomeController.deleteKeyword(keyword:String)
+GET     /deleteKey/:keyword         controllers.HomeController.deleteKeyword(keyword:String)
 GET     /delete/:id                 controllers.HomeController.delete(id:Long)
 GET     /token                      controllers.HomeController.token
 
@@ -15,6 +16,8 @@ GET     /id/:id                     controllers.HomeController.id(id:Long)
 GET     /manage                     controllers.Assets.at(path="/public", file="index.html")
 GET     /schema/:clazz              controllers.HomeController.schema(clazz:String)
 # 匹配单级
+GET     /$shortUrl<(CM|cm).*?>      controllers.HomeController.goGood(shortUrl:String)
+GET     /goods/:shortUrl            controllers.HomeController.goGood(shortUrl:String)
 GET     /:shortUrl                  controllers.HomeController.go(shortUrl:String)
 # 匹配多级
 GET     /*file               controllers.Assets.versioned(path="/public", file: Asset)
