@@ -1,11 +1,10 @@
 package controllers
 
-import java.nio.charset.StandardCharsets
 import java.util.Base64
 
 import javax.inject.{Inject, Singleton}
 import org.slf4j.LoggerFactory
-import play.api.{Configuration, Logger}
+import play.api.Configuration
 import play.api.libs.Codecs
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc._
@@ -26,14 +25,22 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
 
   def index: Action[AnyContent] = Action { Ok(views.html.Introduction()) }
 
-  def go(shortUrl:String): Action[AnyContent] = Action.async {
+  def go(shortUrl:String): Action[AnyContent] = Action.async { r =>
     @inline def handleURL(str: String): String =
       if (str.startsWith("http://") || str.startsWith("https://")) str
       else "http://" + str
-    entityService.find(shortUrl).map {
-      case i if i.nonEmpty => Redirect(handleURL(i.head.redirectURL))
+    entityService.find(shortUrl,r.remoteAddress).map {
+      case i if i != null => Redirect(handleURL(i.redirectURL))
       case _ => NotFound
     }
+  }
+
+  def goHistory(shortUrl:String): Action[AnyContent] = Action.async { _ =>
+    entityService.listFindLog(shortUrl).map(r => Ok(Json.toJson(r)))
+  }
+
+  def goHistoryById(id:Long): Action[AnyContent] = Action.async { _ =>
+    entityService.listFindLogById(id).map(r => Ok(Json.toJson(r)))
   }
 
   def goGood(shortUrl:String): Action[AnyContent] = Action { r =>
@@ -58,13 +65,13 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
 
   ////////////////////////////////// User Private Controller Method //////////////////////////////////
 
-  def info(id:Long): Action[AnyContent] = Action.async { req =>
+  def info(shortUrl:String): Action[AnyContent] = Action.async { req =>
     authUsers(req) flatMap {
       case Right(value) => Future(value)
       case Left(_) =>
-        entityService.id(id).map {
-          case Some(value) => Ok(Json.toJson(value))
-          case None => NotFound
+        entityService.listFindEntityWithLogs(shortUrl).map {
+          case null => NotFound
+          case (e, ls) => Ok(Json.obj("entity" -> e, "logs" -> ls))
         }
     }
   }
@@ -126,11 +133,30 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
   }
 
   ////////////////////////////////// Admin Private Controller Method //////////////////////////////////
+  def infoId(id:Long): Action[AnyContent] = Action.async { req =>
+    authAdmin(req) flatMap {
+      case Right(value) => Future(value)
+      case Left(_) =>
+        entityService.id(id).map {
+          case Some(value) => Ok(Json.toJson(value))
+          case None => NotFound
+        }
+    }
+  }
+
   def list(limit:Int): Action[AnyContent] = Action.async { req =>
     authAdmin(req) flatMap {
       case Right(value) => Future(value)
       case Left(_) =>
         entityService.list(limit).map { bean => Ok(Json.toJson(bean)) }
+    }
+  }
+
+  def listLogs(limit:Int): Action[AnyContent] = Action.async { req =>
+    authAdmin(req) flatMap {
+      case Right(value) => Future(value)
+      case Left(_) =>
+        entityService.listLogs(limit).map { bean => Ok(Json.toJson(bean)) }
     }
   }
 

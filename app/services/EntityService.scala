@@ -1,8 +1,7 @@
 package services
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.LocalDateTime
 
-import controllers.Assets.Asset
 import javax.inject.{Inject, Singleton}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
@@ -25,12 +24,38 @@ class EntityService @Inject()(protected val dbConfigProvider:DatabaseConfigProvi
   }
   private val entity = TableQuery[EntityTable]
 
+  private implicit val autoActionMap: BaseColumnType[EntityAction] = MappedColumnType.base[EntityAction,String](a =>
+    a.getClass.getSimpleName.replace("$",""), _.toLowerCase match {
+      case "visit" => Visit
+      case "edit" => Edit
+      case "create" => Create
+      case "delete" => Delete
+      case _ => Visit
+    })
+
+  private class EntityLogTable(tag:Tag) extends Table[EntityLog](tag, "EntityLogs") {
+    def logId = column[Long]("id", O.PrimaryKey, O.AutoInc)
+    def visitorIP = column[String]("IPAddress")
+    def actionType = column[EntityAction]("action")
+    def actionTime = column[LocalDateTime]("time")
+    def entityId = column[Option[Long]]("entityId")
+    def entityIds = foreignKey("entity_fk",entityId, entity)(_.id.?,
+      onUpdate = ForeignKeyAction.Restrict, onDelete = ForeignKeyAction.SetNull)
+    override def * = (entityId, visitorIP,
+      actionType, actionTime, logId) <> ((EntityLog.apply _).tupled, EntityLog.unapply)
+  }
+  private val entityLog = TableQuery[EntityLogTable]
+
   def list(): Future[Seq[Entity]] = db.run {
     entity.result
   }
 
   def list(limit:Int): Future[Seq[Entity]] = db.run {
-    entity.take(limit).result
+    entity.sortBy(_.updateTime.desc).take(limit).result
+  }
+
+  def listLogs(limit:Int): Future[Seq[EntityLog]] = db.run {
+    entityLog.sortBy(_.actionTime.desc).take(limit).result
   }
 
   def id(id:Long): Future[Option[Entity]] = db.run {
@@ -46,7 +71,7 @@ class EntityService @Inject()(protected val dbConfigProvider:DatabaseConfigProvi
     ).map(savedEntity => false -> savedEntity)
   }
 
-  def delete(id:Long) = db.run {
+  def delete(id:Long): Future[Int] = db.run {
     entity.filter(_.id === id).delete
   }
 
@@ -65,9 +90,42 @@ class EntityService @Inject()(protected val dbConfigProvider:DatabaseConfigProvi
     entity.filter(_.keyword === keyword).result
   }
 
+  def find(keyword:String, fromIP:String): Future[Entity] = db.run {
+    entity.filter(_.keyword === keyword).result.headOption.flatMap ({
+      case Some(e) => (entityLog += new EntityLog(Some(e.id),fromIP,Visit)).map(_ => e)
+      case _ => DBIO.successful(null)
+    }:Option[Entity] => DBIOAction[Entity,NoStream,Effect.All])
+  }
+
+  def addFindLog(log: EntityLog): Future[Int] = db.run {
+    entityLog += log
+  }
+
+  def listFindEntityWithLogs(keyword:String, logLimits:Int = 100): Future[(Entity,Seq[EntityLog])] = db.run {
+    entity.filter(_.keyword === keyword).result.headOption.flatMap ({
+      case Some(e) =>
+        entityLog.filter(_.entityId === e.id).sortBy(_.actionTime.desc).take(logLimits)
+          .result.flatMap(logs => DBIO.successful((e, logs)))
+      case _ => DBIO.successful(null)
+    }:Option[Entity] => DBIOAction[(Entity,Seq[EntityLog]),NoStream,Effect.All])
+  }
+
+  def listFindLog(keyword:String): Future[Seq[EntityLog]] = db.run {
+    entity.filter(_.keyword === keyword).result.headOption.flatMap ({
+      case Some(Entity(_, _, _, _, id)) =>
+        entityLog.filter(_.entityId === id).result
+      case _ => DBIO.successful(Seq[EntityLog]())
+    }:Option[Entity] => DBIOAction[Seq[EntityLog],NoStream,Effect.All])
+  }
+
+  def listFindLogById(id:Long): Future[Seq[EntityLog]] = db.run {
+    entityLog.filter(_.entityId === id).result
+  }
+
   def check(keyword:String): Future[Option[Entity]] = db.run {
     entity.filter(_.keyword === keyword).result.headOption
   }
 
-  def schema: String = entity.schema.createStatements.mkString("\n").replace("\"","'")
+  def schema: String = entity.schema.createStatements.mkString("\n").replace("\"","'") + "\n\n\n\n" +
+    entityLog.schema.createStatements.mkString("\n").replace("\"","'")
 }
