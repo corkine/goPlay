@@ -1,6 +1,6 @@
 name := "go"
  
-version := "2.1.5"
+version := "2.1.6"
 
 description :=
   """
@@ -11,6 +11,7 @@ description :=
     |[Version 2.1.3] 2020-10-15 恢复了之前的 URL 编码方式，放弃对中文编码（交给 JS）。添加 CM(cm) 开头短连接直接跳转到 CMGOOD 系统。
     |[Version 2.1.4] 2020-12-24 实现了跳转日志系统，每个短链接都会记录来访者
     |[Version 2.1.5] 2020-12-24 紧急修复查看 /logs 数据库模型和 Slick 模型不一致问题
+    |[Version 2.1.6] 2021-01-14 添加了 temp/before 临时文件的映射规则
     |""".stripMargin
       
 lazy val `go` = (project in file(".")).enablePlugins(PlayScala,LauncherJarPlugin)

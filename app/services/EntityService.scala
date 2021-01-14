@@ -58,6 +58,12 @@ class EntityService @Inject()(protected val dbConfigProvider:DatabaseConfigProvi
     entityLog.sortBy(_.actionTime.desc).take(limit).result
   }
 
+  /*def listLogsReadable(limit:Int) = db.run {
+    (for {
+      (entity, logs) <- entity joinLeft entityLog on (_.id === _.entityId)
+    } yield (entity, logs))
+  }*/
+
   def id(id:Long): Future[Option[Entity]] = db.run {
     entity.filter(_.id === id).result.headOption
   }

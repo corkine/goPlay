@@ -1,5 +1,7 @@
 package controllers
 
+import java.time.{LocalDate, LocalDateTime}
+import java.time.format.DateTimeFormatter
 import java.util.Base64
 
 import javax.inject.{Inject, Singleton}
@@ -33,6 +35,12 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
       case i if i != null => Redirect(handleURL(i.redirectURL))
       case _ => NotFound
     }
+  }
+
+  def goBefore(shortUrl:String,before:String): Action[AnyContent] = Action.async { r =>
+    val isOK = try LocalDate.from(DateTimeFormatter.BASIC_ISO_DATE.parse(before.replace("before","")))
+      .atStartOfDay().plusDays(1).isAfter(LocalDateTime.now()) catch {case _: Throwable => false }
+    if (isOK) go(shortUrl).apply(r) else Future(message(s"Expired Access to $shortUrl"))
   }
 
   def goHistory(shortUrl:String): Action[AnyContent] = Action.async { _ =>

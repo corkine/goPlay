@@ -22,6 +22,8 @@ GET     /schema/:clazz              controllers.HomeController.schema(clazz:Stri
 # 匹配单级
 GET     /$shortUrl<(CM|cm).*?>      controllers.HomeController.goGood(shortUrl:String)
 GET     /goods/:shortUrl            controllers.HomeController.goGood(shortUrl:String)
+GET     /$shortUrl<temp.*?>/:shortUrl   controllers.HomeController.go(shortUrl:String)
+GET     /$before<before\d\d\d\d\d\d\d\d>/:shortUrl   controllers.HomeController.goBefore(shortUrl:String,before:String)
 GET     /:shortUrl                  controllers.HomeController.go(shortUrl:String)
 # 匹配多级
 GET     /*file               controllers.Assets.versioned(path="/public", file: Asset)
