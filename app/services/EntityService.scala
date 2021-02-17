@@ -1,7 +1,8 @@
 package services
 
-import java.time.LocalDateTime
+import org.lionsoul.ip2region.{DbConfig, DbSearcher, Util}
 
+import java.time.LocalDateTime
 import javax.inject.{Inject, Singleton}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
@@ -12,6 +13,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class EntityService @Inject()(protected val dbConfigProvider:DatabaseConfigProvider)
                              (implicit ec:ExecutionContext)
   extends HasDatabaseConfigProvider[JdbcProfile] {
+
+  val dbSearcher = new DbSearcher(new DbConfig(),"public/ip2region.db")
 
   import profile.api._
   private class EntityTable(tag:Tag) extends Table[Entity](tag, "Entities") {
@@ -58,11 +61,17 @@ class EntityService @Inject()(protected val dbConfigProvider:DatabaseConfigProvi
     entityLog.sortBy(_.actionTime.desc).take(limit).result
   }
 
-  /*def listLogsReadable(limit:Int) = db.run {
+
+  def listLogsReadable(recentDay:Int,limit:Int,withIpResolve:Boolean): Future[Seq[RichEntityLog]] = db.run {
     (for {
-      (entity, logs) <- entity joinLeft entityLog on (_.id === _.entityId)
-    } yield (entity, logs))
-  }*/
+      (entity, logs) <- entityLog.filter(e => e.actionTime >= LocalDateTime.now().minusDays(recentDay))
+        .sortBy(_.actionTime.desc).take(limit) join entity on (_.entityId === _.id)
+    } yield (entity, logs)).result
+  }.map(_.map(a => RichEntityLog(a._1,if (withIpResolve) {
+    if (Util.isIpAddress(a._1.visitorIP)) dbSearcher.memorySearch(a._1.visitorIP).getRegion
+    else "Can't parse IP Address"
+  } else "", a._2.keyword,a._2.redirectURL)))
+
 
   def id(id:Long): Future[Option[Entity]] = db.run {
     entity.filter(_.id === id).result.headOption

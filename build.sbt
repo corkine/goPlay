@@ -1,6 +1,6 @@
 name := "go"
  
-version := "2.1.6"
+version := "2.1.8"
 
 description :=
   """
@@ -12,6 +12,8 @@ description :=
     |[Version 2.1.4] 2020-12-24 实现了跳转日志系统，每个短链接都会记录来访者
     |[Version 2.1.5] 2020-12-24 紧急修复查看 /logs 数据库模型和 Slick 模型不一致问题
     |[Version 2.1.6] 2021-01-14 添加了 temp/before 临时文件的映射规则
+    |[Version 2.1.7] 2021-02-17 丰富了 /logs 的显示选项，更加易读
+    |[Version 2.1.8] 2021-02-17 提供了 /logs IP 地址识别选项
     |""".stripMargin
       
 lazy val `go` = (project in file(".")).enablePlugins(PlayScala,LauncherJarPlugin)
@@ -27,7 +29,8 @@ libraryDependencies ++= Seq(ehcache , ws , specs2 % Test , guice,
   "com.typesafe.play" %% "play-slick-evolutions" % "5.0.0",
   "com.h2database" % "h2" % "1.4.199"
 )
-
+// https://mvnrepository.com/artifact/org.lionsoul/ip2region
+libraryDependencies += "org.lionsoul" % "ip2region" % "1.7.2"
 //"mysql" % "mysql-connector-java" % "5.1.41"
 
 unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )

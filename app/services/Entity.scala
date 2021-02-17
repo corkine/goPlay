@@ -41,3 +41,7 @@ case class EntityLog(entityId:Option[Long], visitorIP:String,
 object EntityLog {
   implicit val entityLogFormat: OWrites[EntityLog] = Json.writes[EntityLog]
 }
+case class RichEntityLog(entityLog: EntityLog, ipInfo: String, keyword: String, url: String)
+object RichEntityLog {
+  implicit val entityLogRichFormat: OWrites[RichEntityLog] = Json.writes[RichEntityLog]
+}

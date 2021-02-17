@@ -31,7 +31,7 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
     @inline def handleURL(str: String): String =
       if (str.startsWith("http://") || str.startsWith("https://")) str
       else "http://" + str
-    entityService.find(shortUrl,r.remoteAddress).map {
+    entityService.find(shortUrl,r.headers.get("X-Real-IP").getOrElse(r.remoteAddress)).map {
       case i if i != null => Redirect(handleURL(i.redirectURL))
       case _ => NotFound
     }
@@ -160,11 +160,11 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
     }
   }
 
-  def listLogs(limit:Int): Action[AnyContent] = Action.async { req =>
+  def listLogs(day:Int,limit:Int,withIpResolve:Boolean): Action[AnyContent] = Action.async { req =>
     authAdmin(req) flatMap {
       case Right(value) => Future(value)
       case Left(_) =>
-        entityService.listLogs(limit).map { bean => Ok(Json.toJson(bean)) }
+        entityService.listLogsReadable(day,limit,withIpResolve).map { bean => Ok(Json.toJson(bean)) }
     }
   }
 
