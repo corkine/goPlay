@@ -22,6 +22,7 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
 
   val logI: String => Unit = LoggerFactory.getLogger(getClass).info(_)
   val goodURL: String = config.get[String]("goods.url")
+  lazy val default: Configuration = config.get[Configuration]("api.default")
 
   ////////////////////////////////// Public API //////////////////////////////////
 
@@ -152,19 +153,28 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
     }
   }
 
-  def list(limit:Int): Action[AnyContent] = Action.async { req =>
+  lazy val LIST_LIMIT: Int = default.get[Int]("list.limit")
+
+  def list(limit:Option[Int]): Action[AnyContent] = Action.async { req =>
     authAdmin(req) flatMap {
       case Right(value) => Future(value)
       case Left(_) =>
-        entityService.list(limit).map { bean => Ok(Json.toJson(bean)) }
+        entityService.list(limit.getOrElse(LIST_LIMIT)).map { bean => Ok(Json.toJson(bean)) }
     }
   }
 
-  def listLogs(day:Int,limit:Int,withIpResolve:Boolean): Action[AnyContent] = Action.async { req =>
+  lazy val LOG_DAY: Int = default.get[Int]("logs.day")
+  lazy val LOG_LIMIT: Int = default.get[Int]("logs.limit")
+  lazy val LOG_IP: Boolean = default.get[Boolean]("logs.ipResolve")
+
+  def listLogs(day:Option[Int],limit:Option[Int],withIpResolve:Option[Boolean]): Action[AnyContent] = Action.async { req =>
     authAdmin(req) flatMap {
       case Right(value) => Future(value)
       case Left(_) =>
-        entityService.listLogsReadable(day,limit,withIpResolve).map { bean => Ok(Json.toJson(bean)) }
+        entityService.listLogsReadable(
+          day.getOrElse(LOG_DAY),
+          limit.getOrElse(LOG_LIMIT),
+          withIpResolve.getOrElse(LOG_IP)).map { bean => Ok(Json.toJson(bean)) }
     }
   }
 

@@ -61,7 +61,6 @@ class EntityService @Inject()(protected val dbConfigProvider:DatabaseConfigProvi
     entityLog.sortBy(_.actionTime.desc).take(limit).result
   }
 
-
   def listLogsReadable(recentDay:Int,limit:Int,withIpResolve:Boolean): Future[Seq[RichEntityLog]] = db.run {
     (for {
       (entity, logs) <- entityLog.filter(e => e.actionTime >= LocalDateTime.now().minusDays(recentDay))

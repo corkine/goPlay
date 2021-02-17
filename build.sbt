@@ -1,6 +1,6 @@
 name := "go"
  
-version := "2.1.8"
+version := "2.1.9"
 
 description :=
   """
@@ -14,6 +14,7 @@ description :=
     |[Version 2.1.6] 2021-01-14 添加了 temp/before 临时文件的映射规则
     |[Version 2.1.7] 2021-02-17 丰富了 /logs 的显示选项，更加易读
     |[Version 2.1.8] 2021-02-17 提供了 /logs IP 地址识别选项
+    |[Version 2.1.9] 2021-02-18 修复了 API 参数不起作用的问题
     |""".stripMargin
       
 lazy val `go` = (project in file(".")).enablePlugins(PlayScala,LauncherJarPlugin)

@@ -1,7 +1,7 @@
 ######## 受保护 API - BASIC OR TOKEN OR QUERY ##########
 GET     /data                       controllers.Default.redirect(to="/list")
-GET     /list                       controllers.HomeController.list(limit:Int = 1000)
-GET     /logs                       controllers.HomeController.listLogs(day:Int = 5, limit:Int = 1000, ip:Boolean = true)
+GET     /list                       controllers.HomeController.list(limit:Option[Int])
+GET     /logs                       controllers.HomeController.listLogs(day:Option[Int], limit:Option[Int], ip:Option[Boolean])
 GET     /info/:shortUrl             controllers.HomeController.info(shortUrl:String)
 GET     /infoId/:id                 controllers.HomeController.infoId(id:Long)
 GET     /logs/:shortUrl             controllers.HomeController.goHistory(shortUrl:String)
