@@ -1,0 +1,14 @@
+@import services.Entity
+@(list:Seq[Entity],searchFor:String)
+@main(s"🔍 $searchFor - 搜索结果") {
+    <div style="padding-top: 1em"></div>
+    <h1 style="padding-left: 0.5em">Search Result - @searchFor</h1>
+    <div class="list-group">
+        @for(entity <- list){
+            <a href="@entity.redirectURL" class="list-group-item" style="text-decoration:none">
+            <span style="vertical-align: center" class="badge badge-light">#@entity.id</span> @entity.keyword
+                <span style="color: lightgray">@entity.redirectURL</span>
+            </a>
+        }
+    </div>
+}

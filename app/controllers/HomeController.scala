@@ -141,6 +141,18 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
     }
   }
 
+  def searchKeyword(keyword:String, useJSON:Boolean): Action[AnyContent] = Action.async { req =>
+    authUsers(req) flatMap {
+      case Right(value) => Future(value)
+      case Left(_) => if (keyword.toUpperCase().startsWith("CM")) {
+        Future(Ok(Json.obj("status" -> 1, "message" -> "Exist! Don't use CM/cm/Cm/cM start keywords in system.", "entity" -> None)))
+      } else entityService.search(keyword).map { value =>
+         if (useJSON) Ok(Json.toJson(value))
+         else Ok(views.html.result(value,keyword))
+      }
+    }
+  }
+
   ////////////////////////////////// Admin Private Controller Method //////////////////////////////////
   def infoId(id:Long): Action[AnyContent] = Action.async { req =>
     authAdmin(req) flatMap {

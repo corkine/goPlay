@@ -1,6 +1,7 @@
 package services
 
 import org.lionsoul.ip2region.{DbConfig, DbSearcher, Util}
+import play.api.Logger
 
 import java.time.LocalDateTime
 import javax.inject.{Inject, Singleton}
@@ -138,6 +139,10 @@ class EntityService @Inject()(protected val dbConfigProvider:DatabaseConfigProvi
 
   def check(keyword:String): Future[Option[Entity]] = db.run {
     entity.filter(_.keyword === keyword).result.headOption
+  }
+
+  def search(keyword:String): Future[Seq[Entity]] = db.run {
+    entity.filter(_.keyword like s"%$keyword%").sortBy(_.updateTime.desc).result
   }
 
   def schema: String = entity.schema.createStatements.mkString("\n").replace("\"","'") + "\n\n\n\n" +
