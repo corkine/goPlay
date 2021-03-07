@@ -17,6 +17,11 @@ POST    /add                        controllers.HomeController.addJSON
 GET     /deleteKey/:keyword         controllers.HomeController.deleteKeyword(keyword:String)
 GET     /delete/:id                 controllers.HomeController.delete(id:Long)
 GET     /token                      controllers.HomeController.token
+GET     /user/:username/:password/addadmin   controllers.HomeController.addUpdateDeleteUser(username:String,password:String,isAdd:Boolean=true,isAdmin:Boolean=true,isDelete:Boolean=false,isUpdate:Boolean=false)
+GET     /user/:username/:password/addcommon   controllers.HomeController.addUpdateDeleteUser(username:String,password:String,isAdd:Boolean=true,isAdmin:Boolean=false,isDelete:Boolean=false,isUpdate:Boolean=false)
+GET     /user/:username/:password/delete   controllers.HomeController.addUpdateDeleteUser(username:String,password:String,isAdd:Boolean=false,isAdmin:Boolean=false,isDelete:Boolean=true,isUpdate:Boolean=false)
+GET     /user/:username/:password/update   controllers.HomeController.addUpdateDeleteUser(username:String,password:String,isAdd:Boolean=false,isAdmin:Boolean=false,isDelete:Boolean=false,isUpdate:Boolean=true)
+GET     /user/list                  controllers.HomeController.listUsers()
 
 #######  公共 API  ########
 GET     /                           controllers.HomeController.index

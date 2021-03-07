@@ -1,8 +1,11 @@
 package services
 
+import play.api.Logger
+
 import javax.inject.{Inject, Singleton}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.libs.Codecs
+import slick.dbio.DBIOAction
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -52,23 +55,20 @@ class UserService @Inject()(protected val dbConfigProvider:DatabaseConfigProvide
 
   def schema: String = users.schema.createStatements.mkString(" ")
 
-  def add(username:String,password:String,role:UserType): Future[Boolean] =
-    for {
-      userExist <- db.run(users.filter(_.username === username).exists.result)
-      _ <- if (!userExist) db.run(users += User(username, password, role))
-           else Future.successful(0)
-    } yield !userExist
-
-    /*def add2(username:String,password:String): Future[Boolean] =
-    (for {
-      userExist <- db.run(users.filter(_.username === username).exists.result)
-      _ <- db.run(users += User(username, password)) if !userExist
-    } yield !userExist).recover {
-      case _ => false
-    }*/
-
   def list: Future[Seq[User]] = db.run(users.result)
 
-  def delete(id:Long): Future[Int] = db.run(users.filter(_.id === id).delete)
+  def updateUser(username:String,password:String): Future[Int] = db.run {
+    users.filter(_.username === username).map(_.password).update(password)
+  }
+
+  def deleteUser(username:String):Future[Int] = db.run {
+    users.filter(_.username === username).delete
+  }
+
+  def addUser(user:User): Future[Int] = db.run(users.filter(_.username === user.username)
+    .result.headOption).map {
+    case None => users += user
+    case Some(_) => DBIOAction.successful(0)
+  }.flatMap(db.run(_))
 
 }

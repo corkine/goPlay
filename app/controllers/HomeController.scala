@@ -211,32 +211,27 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
     }
   }
 
-  def listUser = Action.async { req => authAdmin(req) flatMap {
-      case Left(_) => userService.list.map { res => Ok(Json.toJson(res)) }
-      case Right(value) => Future(value)
-    }
-  }
-
-  def addUser(username:String, password:String, role:Option[UserType]) = Action.async { req =>
-    authAdmin(req) flatMap {
-      case Right(value) => Future(value)
-      case Left(_) => userService.add(username,password,role.getOrElse(Common)).map {
-          case true => message("User add done.")
-          case false => message("User add failed.")
-        }
-    }
-  }
-
-  def deleteUser(id:Long) = Action.async { req =>
+  def addUpdateDeleteUser(username:String,password:String,isAdd:Boolean,isAdmin:Boolean,
+                          isDelete:Boolean,isUpdate:Boolean): Action[AnyContent] = Action.async { req =>
     authAdmin(req) flatMap {
       case Right(value) => Future(value)
       case Left(_) =>
-        userService.delete(id) map {
-          case 0 => message("delete failed.")
-          case o => message(s"delete done with $o rows.")
+        { if (isAdd) userService.addUser(User(username,password,if (isAdmin) Admin else Common))
+          else if (isUpdate) userService.updateUser(username, password)
+          else if (isDelete) userService.deleteUser(username)
+          else Future(0) } map {
+          case 0 => message("handle failed.")
+          case o => message(s"handle done with $o rows.")
         }
     }
-  }
+}
+
+  def listUsers(): Action[AnyContent] = Action.async { req =>
+      authAdmin(req) flatMap {
+        case Right(value) => Future(value)
+        case Left(_) => userService.list map { users => Ok(Json.toJson(users)) }
+      }
+    }
 
   ////////////////////////////////// Useful Tools //////////////////////////////////
 

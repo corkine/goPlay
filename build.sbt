@@ -1,6 +1,6 @@
 name := "go"
  
-version := "2.1.10"
+version := "2.1.11"
 
 description :=
   """
@@ -16,6 +16,7 @@ description :=
     |[Version 2.1.8] 2021-02-17 提供了 /logs IP 地址识别选项
     |[Version 2.1.9] 2021-02-18 修复了 API 参数不起作用的问题
     |[Version 2.1.10] 2021-03-07 增加了搜索功能
+    |[Version 2.1.11] 2021-03-07 提供了用户 API 支持
     |""".stripMargin
       
 lazy val `go` = (project in file(".")).enablePlugins(PlayScala,LauncherJarPlugin)
