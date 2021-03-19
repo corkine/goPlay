@@ -37,6 +37,10 @@ GET     /$before<before\d\d\d\d\d\d\d\d>/:shortUrl   controllers.HomeController.
 GET     /:keyword/all               controllers.HomeController.searchKeyword(keyword:String,useJson:Boolean=false)
 GET     /:keyword/json              controllers.HomeController.searchKeyword(keyword:String,useJson:Boolean=true)
 GET     /:keyword/alljson              controllers.HomeController.searchKeyword(keyword:String,useJson:Boolean=true)
+GET     /:shortUrl/info             controllers.HomeController.info(shortUrl:String)
+GET     /:shortUrl/secret           controllers.HomeController.setSecret(shortUrl:String,secret:String="")
+GET     /:shortUrl/secret/          controllers.HomeController.setSecret(shortUrl:String,secret:String="")
+GET     /:shortUrl/secret/:secret   controllers.HomeController.setSecret(shortUrl:String,secret:String)
 GET     /:shortUrl                  controllers.HomeController.go(shortUrl:String)
 # 匹配多级
 GET     /*file               controllers.Assets.versioned(path="/public", file: Asset)
