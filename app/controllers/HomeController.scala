@@ -33,7 +33,14 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
       if (str.startsWith("http://") || str.startsWith("https://")) str
       else "http://" + str
     entityService.find(shortUrl,r.headers.get("X-Real-IP").getOrElse(r.remoteAddress)).map {
-      case i if i != null => Redirect(handleURL(i.redirectURL))
+      case i if i != null => i.note match {
+        case Some(text) if text.startsWith("MS") =>
+          val sec = r.getQueryString("secret")
+          if (sec.nonEmpty && text.startsWith(s"MS${sec.get}MS")) Redirect(handleURL(i.redirectURL))
+          else Ok(views.html.guard(
+            r.getQueryString("retry").exists(m => if (m.toUpperCase == "TRUE") true else false)))
+        case _ => Redirect(handleURL(i.redirectURL))
+      }
       case _ => NotFound
     }
   }
@@ -75,12 +82,23 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
   ////////////////////////////////// User Private Controller Method //////////////////////////////////
 
   def info(shortUrl:String): Action[AnyContent] = Action.async { req =>
-    authUsers(req) flatMap {
+    authAdmin(req) flatMap {
       case Right(value) => Future(value)
       case Left(_) =>
         entityService.listFindEntityWithLogs(shortUrl).map {
           case null => NotFound
           case (e, ls) => Ok(Json.obj("entity" -> e, "logs" -> ls))
+        }
+    }
+  }
+
+  def setSecret(shortUrl:String, secret:String): Action[AnyContent] = Action.async { req =>
+    authAdmin(req) flatMap {
+      case Right(value) => Future(value)
+      case Left(_) =>
+        entityService.setSecret(shortUrl,
+          if (secret.nonEmpty) Some(secret) else None).map { res =>
+          message(s"Set password for $shortUrl return $res")
         }
     }
   }

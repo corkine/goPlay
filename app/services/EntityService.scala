@@ -125,6 +125,10 @@ class EntityService @Inject()(protected val dbConfigProvider:DatabaseConfigProvi
     }:Option[Entity] => DBIOAction[(Entity,Seq[EntityLog]),NoStream,Effect.All])
   }
 
+  def setSecret(shortUrl:String, secret:Option[String]): Future[Int] = db.run {
+    entity.filter(_.keyword === shortUrl).map(_.note).update(secret.map(sec => s"MS${sec}MS"))
+  }
+
   def listFindLog(keyword:String): Future[Seq[EntityLog]] = db.run {
     entity.filter(_.keyword === keyword).result.headOption.flatMap ({
       case Some(Entity(_, _, _, _, id)) =>

@@ -1,6 +1,6 @@
 name := "go"
  
-version := "2.1.11"
+version := "2.1.12"
 
 description :=
   """
@@ -17,6 +17,7 @@ description :=
     |[Version 2.1.9] 2021-02-18 修复了 API 参数不起作用的问题
     |[Version 2.1.10] 2021-03-07 增加了搜索功能
     |[Version 2.1.11] 2021-03-07 提供了用户 API 支持
+    |[Version 2.1.12] 2021-03-19 提供了访问密码控制
     |""".stripMargin
       
 lazy val `go` = (project in file(".")).enablePlugins(PlayScala,LauncherJarPlugin)
