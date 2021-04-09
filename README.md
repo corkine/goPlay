@@ -7,12 +7,15 @@
 ### 基本的 HTML 视图
 
 Play 后端使用 RESTful API 提供服务，前端可直接通过 go.mazhangjing.com/xxx 进行跳转，也可以通过 mazhangjing.com/xxx 先跳转到 go.mazhangjing.com，然后进行二次跳转。
-提供了一个基于 Vue 的管理页面：https://go.mazhangjing.com/manage。 其需要进行 Token 验证，可向数据库进行增、删、改、精准查找操作。
+提供了一个基于 Vue 的管理页面：https://go.mazhangjing.com/manage 。 其需要进行 Token 验证，可向数据库进行增、删、改、精准查找操作。
+
+![](http://static2.mazhangjing.com/20210409/1e6832c_屏幕截图2021-04-09113038.jpg)
+
 此外，基于 URL 暴露了一个快速的查找功能：https://go.mazhangjing.com/???/all[alljson]  可返回 Bootstrap 框架 HTML 或 JSON 格式的关于 ??? 的数据库搜索结果，其需要 Basic 认证登录。
 
-详情参见 app/views/{xxx}.scala.html 所提供的 HTML 视图和 conf/route 路由文件。
-
 ![](http://static2.mazhangjing.com/20210409/d6388f3_截屏2021-04-09上午10.36.30.png)
+
+详情参见 app/views/{xxx}.scala.html 所提供的 HTML 视图和 conf/route 路由文件。
 
 ### iOS 快捷方式提供的快捷视图
 
