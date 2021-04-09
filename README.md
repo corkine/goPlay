@@ -19,7 +19,7 @@ Play 后端使用 RESTful API 提供服务，前端可直接通过 go.mazhangjin
 
 ### iOS 快捷方式提供的快捷视图
 
-基于 Play 的 RESTful API，通过 iOS 的 "快捷方式" APP 提供了任意网址通过"分享"菜单快速创建对应短链接的功能。因为此 APP 需要硬编码用户名和密码，因此不做分享，详情请联系 concat@mazhanjging.com。
+基于 Play 的 RESTful API，通过 iOS 的 "快捷方式" APP 提供了任意网址通过"分享"菜单快速创建对应短链接的功能。因为此 APP 需要硬编码用户名和密码，因此不做分享，详情请联系 git@mazhangjing.com。
 
 ![](http://static2.mazhangjing.com/20210409/a969d67_截屏2021-04-09上午10.41.26.png)
 
