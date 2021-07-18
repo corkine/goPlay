@@ -22,6 +22,7 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
 
   val logI: String => Unit = LoggerFactory.getLogger(getClass).info(_)
   val goodURL: String = config.get[String]("goods.url")
+  val repoBaseURL: String = config.get[String]("repo.url")
   lazy val default: Configuration = config.get[Configuration]("api.default")
 
   ////////////////////////////////// Public API //////////////////////////////////
@@ -61,6 +62,10 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
 
   def goGood(shortUrl:String): Action[AnyContent] = Action { r =>
     Redirect(s"$goodURL/$shortUrl/details", r.queryString)
+  }
+
+  def repoRedirect(repoUrl:String): Action[AnyContent] = Action { r =>
+    Redirect(s"$repoBaseURL/$repoUrl", r.queryString)
   }
 
   def id(id:Long): Action[AnyContent] = Action.async {
