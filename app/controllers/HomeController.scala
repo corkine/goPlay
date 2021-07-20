@@ -37,10 +37,13 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
       case i if i != null => i.note match {
         case Some(text) if text.startsWith("MS") =>
           val sec = r.getQueryString("secret")
-          if (sec.nonEmpty && text.startsWith(s"MS${sec.get}MS")) Redirect(handleURL(i.redirectURL))
-          else Ok(views.html.guard(
+          if (sec.nonEmpty && text.startsWith(s"MS${sec.get}MS")) {
+            //带有 secret 的 Redirect
+            Redirect(handleURL(i.redirectURL),r.queryString)
+          } else Ok(views.html.guard(
             r.getQueryString("retry").exists(m => if (m.toUpperCase == "TRUE") true else false)))
-        case _ => Redirect(handleURL(i.redirectURL))
+          //一般的 Redirect
+        case _ => Redirect(handleURL(i.redirectURL),r.queryString)
       }
       case _ => NotFound
     }

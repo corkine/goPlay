@@ -1,6 +1,6 @@
 name := "go"
  
-version := "2.1.13"
+version := "2.1.14"
 
 description :=
   """
@@ -19,6 +19,7 @@ description :=
     |[Version 2.1.11] 2021-03-07 提供了用户 API 支持
     |[Version 2.1.12] 2021-03-19 提供了访问密码控制
     |[Version 2.1.13] 2021-07-18 提供了 /repo/xxx 的跳转
+    |[Version 2.1.14] 2021-07-20 修复了跳转导致的参数丢失问题
     |""".stripMargin
       
 lazy val `go` = (project in file(".")).enablePlugins(PlayScala,LauncherJarPlugin)
