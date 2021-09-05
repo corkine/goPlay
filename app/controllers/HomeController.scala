@@ -30,22 +30,36 @@ class HomeController @Inject()(cc:ControllerComponents, entityService: EntitySer
   def index: Action[AnyContent] = Action { Ok(views.html.Introduction()) }
 
   def go(shortUrl:String): Action[AnyContent] = Action.async { r =>
+    if (shortUrl.startsWith("p-")) {
+      authAdmin(r) flatMap {
+        case Right(value) => Future(value)
+        case Left(_) => goInside(shortUrl)(r)
+      }
+    } else goInside(shortUrl)(r)
+  }
+
+  def goInside(shortUrl:String): Action[AnyContent] = Action.async { r =>
     @inline def handleURL(str: String): String =
       if (str.startsWith("http://") || str.startsWith("https://")) str
       else "http://" + str
-    entityService.find(shortUrl,r.headers.get("X-Real-IP").getOrElse(r.remoteAddress)).map {
+    entityService.find(shortUrl,r.headers.get("X-Real-IP").getOrElse(r.remoteAddress)).flatMap {
       case i if i != null => i.note match {
         case Some(text) if text.startsWith("MS") =>
           val sec = r.getQueryString("secret")
           if (sec.nonEmpty && text.startsWith(s"MS${sec.get}MS")) {
             //带有 secret 的 Redirect
-            Redirect(handleURL(i.redirectURL),r.queryString)
-          } else Ok(views.html.guard(
-            r.getQueryString("retry").exists(m => if (m.toUpperCase == "TRUE") true else false)))
-          //一般的 Redirect
-        case _ => Redirect(handleURL(i.redirectURL),r.queryString)
+            Future(Redirect(handleURL(i.redirectURL),r.queryString))
+          } else Future(Ok(views.html.guard(
+            r.getQueryString("retry").exists(m => if (m.toUpperCase == "TRUE") true else false))))
+        case _ => //一般的 Redirect
+          if (shortUrl.startsWith("p-")) {
+            authAdmin(r) flatMap {
+              case Right(value) => Future(value)
+              case Left(_) => Future(Redirect(handleURL(i.redirectURL),r.queryString))
+            }
+          } else Future(Redirect(handleURL(i.redirectURL),r.queryString))
       }
-      case _ => NotFound
+      case _ => Future(NotFound)
     }
   }
 
