@@ -2,6 +2,8 @@
 
 短链接跳转服务器，部署在 go.mazhangjing.com，项目基于 Scala Playframework，Slick ORM + H2 Database。用于替代现有的基于 Spring Boot 和 JPA 的实现。
 
+> **此项目现已不再维护，其功能将迁移到 CyberMe Clojure 服务端作为一个模块，原有 API 和地址照旧提供服务。**
+
 ## 前端界面
 
 ### 基本的 HTML 视图
